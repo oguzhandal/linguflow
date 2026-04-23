@@ -554,13 +554,23 @@
                 },
 
                 handleTextSelection(e) {
+                    // GUARD: Eğer okuyucu modunda değilsek menüyü asla gösterme
+                    if (this.view !== 'reader') return;
+
                     if (e.target.closest('.ui-element')) return;
+
                     const selection = window.getSelection();
                     const text = selection.toString().trim();
+
                     if (text && text.length > 0) {
                         const range = selection.getRangeAt(0);
                         const rect = range.getBoundingClientRect();
-                        this.selectionMenu = { show: true, x: rect.left + rect.width / 2, y: rect.top - 10, text: text };
+                        this.selectionMenu = {
+                            show: true,
+                            x: rect.left + rect.width / 2,
+                            y: rect.top - 10,
+                            text: text
+                        };
                     } else if (!e.target.closest('.selection-menu')) {
                         this.selectionMenu.show = false;
                     }
@@ -586,10 +596,14 @@
                 isNearCenter(index) { return Math.abs((index * 500) - this.scrollOffset) < 250; },
 
                 openNote(index, word = '') {
-                    this.paused = true; this.selectedId = index;
+                    if (this.view !== 'reader') return;
+
+                    this.paused = true;
+                    this.selectedId = index;
                     this.selectedWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
                     const key = `n-${this.currentCategory.id}-${this.currentStory.stage}-${index}-${this.selectedWord}`;
-                    this.tempNote = this.notes[key] || ''; this.showModal = true;
+                    this.tempNote = this.notes[key] || '';
+                    this.showModal = true;
                     this.speak(this.selectedWord);
                 },
 
